@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; object-src 'none'; base-uri 'none'">
+  <title>NoteNest</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <button id="btn-nav" class="icon-btn" title="Show/hide notebooks (Ctrl+Shift+B)">☰</button>
+      <img src="../assets/icon.png" alt="" class="brand-icon">NoteNest
+    </div>
+    <div class="search">
+      <input id="search" type="search" placeholder="Search all notes (Ctrl+E)" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="top-actions">
+      <button id="btn-fullscreen" class="icon-btn" title="Full screen (F11)">⛶</button>
+      <button id="btn-theme" class="icon-btn" title="Toggle dark mode">◐</button>
+      <button id="btn-more" class="icon-btn" title="More">⋯</button>
+    </div>
+  </header>
+
+  <main class="layout" id="layout">
+    <nav class="nav" aria-label="Notebooks and sections">
+      <div class="nav-head">
+        <span>Notebooks</span>
+        <span class="head-btns">
+          <button id="add-notebook" class="mini-btn" title="New notebook">+</button>
+          <button id="collapse-nav" class="mini-btn" title="Hide notebooks (Ctrl+Shift+B)">«</button>
+        </span>
+      </div>
+      <div id="notebooks" class="nav-list"></div>
+      <div class="nav-foot">
+        <button id="add-section" class="link-btn">+ Add section</button>
+        <button id="open-trash" class="link-btn">🗑 Recycle bin</button>
+      </div>
+    </nav>
+
+    <aside class="pages" aria-label="Pages">
+      <div class="pages-head">
+        <span id="pages-title">Pages</span>
+        <span class="head-btns">
+          <button id="add-page" class="mini-btn" title="New page (Ctrl+N)">+</button>
+          <button id="collapse-pages" class="mini-btn" title="Hide pages (Ctrl+Shift+G)">«</button>
+        </span>
+      </div>
+      <div id="pages" class="page-list"></div>
+    </aside>
+
+    <section class="editor-wrap">
+      <div class="ribbon" id="ribbon">
+        <div class="tabs" role="tablist">
+          <button class="pane-tab" id="expand-panes" title="Show notebooks and pages" hidden>»</button>
+          <button class="tab" data-tab="home">Home</button>
+          <button class="tab" data-tab="insert">Insert</button>
+          <button class="tab" data-tab="draw">Draw</button>
+          <button class="tab" data-tab="view">View</button>
+          <span class="tab-spacer"></span>
+          <span class="mode-label" id="mode-label"></span>
+        </div>
+
+        <div class="toolbar" id="toolbar">
+          <div class="panel" data-panel="home">
+            <select id="tb-block" title="Paragraph style">
+              <option value="p">Normal</option>
+              <option value="h1">Heading 1</option>
+              <option value="h2">Heading 2</option>
+              <option value="h3">Heading 3</option>
+              <option value="blockquote">Quote</option>
+              <option value="pre">Code</option>
+            </select>
+            <span class="sep"></span>
+            <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+            <button data-cmd="strikeThrough" title="Strikethrough (Ctrl+-)"><s>S</s></button>
+            <button id="tb-hl-apply" title="Highlight (Ctrl+Alt+H)"><span class="hl-swatch" id="hl-swatch">ab</span></button>
+            <label class="color-btn caret-btn" title="Choose highlight color">▾<input type="color" id="tb-highlight" value="#fff176"></label>
+            <button id="tb-fc-apply" title="Font color"><span class="fc-swatch" id="fc-swatch">A</span></button>
+            <label class="color-btn caret-btn" title="Choose font color">▾<input type="color" id="tb-color" value="#d32f2f"></label>
+            <button data-cmd="removeFormat" title="Clear formatting">⌫</button>
+            <span class="sep"></span>
+            <button data-cmd="insertUnorderedList" title="Bulleted list">•≡</button>
+            <button data-cmd="insertOrderedList" title="Numbered list">1≡</button>
+            <button id="tb-todo" title="To-do checkbox (Ctrl+1)">☑</button>
+            <button data-cmd="outdent" title="Decrease indent (Shift+Tab)">⇤</button>
+            <button data-cmd="indent" title="Increase indent (Tab)">⇥</button>
+          </div>
+
+          <div class="panel" data-panel="insert">
+            <button id="tb-space" class="wide" title="Insert space: drag down on the page to add room, drag up to remove it">↕ Insert space</button>
+            <span class="sep"></span>
+            <button id="tb-link" class="wide" title="Link (Ctrl+K)">🔗 Link</button>
+            <button id="tb-image" class="wide" title="Insert picture">🖼 Picture</button>
+            <button id="tb-table" class="wide" title="Insert table">▦ Table</button>
+            <button id="tb-hr" class="wide" title="Divider line">― Divider</button>
+            <button id="tb-date" class="wide" title="Insert date and time (Alt+Shift+F)">🕒 Date &amp; time</button>
+            <input type="file" id="image-input" accept="image/*" hidden>
+          </div>
+
+          <div class="panel" data-panel="draw" id="draw-panel">
+            <button data-tool="" class="tool" title="Type (Esc)"><span class="tool-ico">Ꮖ</span></button>
+            <span class="sep"></span>
+            <button data-tool="pen1" class="tool" title="Pen 1 (click again for color and size)"></button>
+            <button data-tool="pen2" class="tool" title="Pen 2 (click again for color and size)"></button>
+            <button data-tool="pen3" class="tool" title="Pen 3 (click again for color and size)"></button>
+            <button data-tool="pen4" class="tool" title="Pen 4 (click again for color and size)"></button>
+            <span class="sep"></span>
+            <button data-tool="eraser" class="tool" title="Eraser (click again for size)"></button>
+            <span class="sep"></span>
+            <button data-tool="hl1" class="tool" title="Highlighter 1 (click again for color and size)"></button>
+            <button data-tool="hl2" class="tool" title="Highlighter 2 (click again for color and size)"></button>
+          </div>
+
+          <div class="panel" data-panel="view">
+            <button id="tb-nav" class="wide" title="Show/hide notebooks (Ctrl+Shift+B)">☰ Notebooks</button>
+            <button id="tb-pages" class="wide" title="Show/hide pages (Ctrl+Shift+G)">▤ Pages</button>
+            <button id="tb-fullscreen" class="wide" title="Full screen (F11)">⛶ Full screen</button>
+            <span class="sep"></span>
+            <button id="tb-rules" class="wide" title="Toggle rule lines">☰ Rule lines ▾</button>
+            <span class="sep"></span>
+            <button id="tb-pdf" class="wide" title="Export this page as PDF">📄 Export PDF</button>
+            <button id="tb-print" class="wide" title="Print page (Ctrl+P)">⎙ Print</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-scroll" id="editor-scroll">
+        <div class="page-sheet" id="sheet">
+          <input id="page-title" class="page-title" placeholder="Untitled page" spellcheck="true">
+          <div id="page-meta" class="page-meta"></div>
+          <div id="editor" class="editor" contenteditable="true" spellcheck="true"></div>
+          <canvas id="ink-main" class="ink"></canvas>
+          <canvas id="ink-live" class="ink ink-live"></canvas>
+        </div>
+        <div class="empty-state" id="empty-state" hidden>
+          <p>No page selected.</p>
+          <button id="empty-add" class="primary-btn">Create a page</button>
+        </div>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+  </main>
+
+  <div id="search-results" class="search-results" hidden></div>
+  <div id="menu" class="menu" hidden></div>
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="modal-title"></h3>
+      <div id="modal-body"></div>
+      <div class="modal-actions">
+        <button id="modal-cancel">Cancel</button>
+        <button id="modal-ok" class="primary-btn">OK</button>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="ink.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Dependencies: recreate with `npm install`
+node_modules/
+
+# Build output: the installer is published as a GitHub Release instead
+dist/
+smoke-out/
+
+# Logs and OS clutter
+*.log
+Thumbs.db
+.DS_Store

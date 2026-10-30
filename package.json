@@ -1,0 +1,42 @@
+{
+  "name": "notenest",
+  "productName": "NoteNest",
+  "version": "1.0.0",
+  "description": "A simple desktop notebook app: notebooks, sections and pages with rich text.",
+  "main": "main.js",
+  "private": true,
+  "author": "NoteNest",
+  "scripts": {
+    "start": "electron .",
+    "package": "node tools/build-win.js",
+    "installer": "npm run package && electron-builder --win nsis --x64 --prepackaged dist/NoteNest-win32-x64"
+  },
+  "build": {
+    "appId": "com.notenest.app",
+    "productName": "NoteNest",
+    "directories": { "output": "dist/installer" },
+    "win": { "icon": "assets/icon.ico" },
+    "nsis": {
+      "artifactName": "notenest_setup.exe",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NoteNest",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "uninstallDisplayName": "NoteNest",
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.3.6",
+    "electron": "^33.2.1",
+    "electron-builder": "^26.18.0"
+  },
+  "allowScripts": {
+    "electron@33.4.11": true,
+    "electron-winstaller": false
+  }
+}
